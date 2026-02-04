@@ -45,7 +45,7 @@
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: transform 0.1s ease;
   }
 
   #yes {
@@ -100,15 +100,25 @@ const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
 const music = document.getElementById("music");
 
-let yesScale = 1.1;
+// YES button animation: slowly expand over 15 seconds
+function expandYes() {
+  yesBtn.style.transition = "all 15s linear";
+  yesBtn.style.width = "90vw";
+  yesBtn.style.height = "80vh";
+  yesBtn.style.fontSize = "4rem";
+  yesBtn.style.left = "5vw";
+  yesBtn.style.bottom = "10vh";
+  yesBtn.style.borderRadius = "20px";
+}
 
-// NO button position and velocity
+// NO button position
 let noX = window.innerWidth * 0.6;
 let noY = window.innerHeight * 0.5;
 let velX = 0;
 let velY = 0;
 
-function moveNo(mouseX, mouseY) {
+// Function to make NO dodge when mouse is near
+function dodgeNo(mouseX, mouseY) {
   const btnCenterX = noX + noBtn.offsetWidth / 2;
   const btnCenterY = noY + noBtn.offsetHeight / 2;
 
@@ -116,15 +126,16 @@ function moveNo(mouseX, mouseY) {
   const dy = btnCenterY - mouseY;
   const distance = Math.sqrt(dx*dx + dy*dy);
 
-  // Speed increases the closer the mouse is
-  const maxSpeed = 25; // maximum speed
-  const minSpeed = 5;  // minimum speed
-  const speed = Math.min(maxSpeed, Math.max(minSpeed, 200 / distance));
-
-  // Calculate velocity direction
-  const angle = Math.atan2(dy, dx);
-  velX = Math.cos(angle) * speed;
-  velY = Math.sin(angle) * speed;
+  const safeDistance = 150; // pixels before it starts moving
+  if(distance < safeDistance){
+    const angle = Math.atan2(dy, dx);
+    const speed = 15; // fast dodge
+    velX = Math.cos(angle) * speed;
+    velY = Math.sin(angle) * speed;
+  } else {
+    velX = 0;
+    velY = 0;
+  }
 
   // Update position
   noX += velX;
@@ -136,59 +147,3 @@ function moveNo(mouseX, mouseY) {
   if(noX > window.innerWidth - noBtn.offsetWidth) { 
     noX = window.innerWidth - noBtn.offsetWidth; velX *= -1; 
   }
-  if(noY > window.innerHeight - noBtn.offsetHeight) { 
-    noY = window.innerHeight - noBtn.offsetHeight; velY *= -1; 
-  }
-
-  noBtn.style.left = noX + "px";
-  noBtn.style.top = noY + "px";
-
-  // YES grows slightly whenever NO moves
-  yesScale += 0.01;
-  yesBtn.style.transform = `scale(${yesScale})`;
-
-  requestAnimationFrame(() => moveNo(mouseX, mouseY));
-}
-
-// Track mouse/touch
-document.addEventListener("mousemove", e => moveNo(e.clientX, e.clientY));
-document.addEventListener("touchmove", e => {
-  if(e.touches.length > 0){
-    moveNo(e.touches[0].clientX, e.touches[0].clientY);
-  }
-});
-
-// YES clicked
-yesBtn.addEventListener("click", () => {
-  music.play();
-
-  document.body.innerHTML = `
-    <div style="color:white; text-align:center; padding:40px; animation: fadeIn 2s;">
-      <h1>YAYYYY 💕🥰</h1>
-      <h2>Simran, you just made me the happiest person ❤️</h2>
-      <p style="font-size:1.3rem; margin-top:30px; line-height:1.6;">
-        I love you ❤️<br><br>
-        From your amazing and one of a kind man,<br>
-        <strong>Aaron x</strong>
-      </p>
-    </div>
-  `;
-
-  setInterval(createHeart, 250);
-});
-
-// Floating hearts
-function createHeart() {
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.innerHTML = "❤️";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.fontSize = Math.random() * 20 + 15 + "px";
-  document.body.appendChild(heart);
-
-  setTimeout(() => heart.remove(), 6000);
-}
-</script>
-
-</body>
-</html>
