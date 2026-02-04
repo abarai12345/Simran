@@ -100,24 +100,13 @@ const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
 const music = document.getElementById("music");
 
-// YES button animation: slowly expand over 15 seconds
-function expandYes() {
-  yesBtn.style.transition = "all 15s linear";
-  yesBtn.style.width = "90vw";
-  yesBtn.style.height = "80vh";
-  yesBtn.style.fontSize = "4rem";
-  yesBtn.style.left = "5vw";
-  yesBtn.style.bottom = "10vh";
-  yesBtn.style.borderRadius = "20px";
-}
-
 // NO button position
 let noX = window.innerWidth * 0.6;
 let noY = window.innerHeight * 0.5;
 let velX = 0;
 let velY = 0;
 
-// Function to make NO dodge when mouse is near
+// Dodge NO when mouse is near
 function dodgeNo(mouseX, mouseY) {
   const btnCenterX = noX + noBtn.offsetWidth / 2;
   const btnCenterY = noY + noBtn.offsetHeight / 2;
@@ -126,24 +115,5 @@ function dodgeNo(mouseX, mouseY) {
   const dy = btnCenterY - mouseY;
   const distance = Math.sqrt(dx*dx + dy*dy);
 
-  const safeDistance = 150; // pixels before it starts moving
-  if(distance < safeDistance){
-    const angle = Math.atan2(dy, dx);
-    const speed = 15; // fast dodge
-    velX = Math.cos(angle) * speed;
-    velY = Math.sin(angle) * speed;
-  } else {
-    velX = 0;
-    velY = 0;
-  }
-
-  // Update position
-  noX += velX;
-  noY += velY;
-
-  // Bounce off edges
-  if(noX < 0) { noX = 0; velX *= -1; }
-  if(noY < 0) { noY = 0; velY *= -1; }
-  if(noX > window.innerWidth - noBtn.offsetWidth) { 
-    noX = window.innerWidth - noBtn.offsetWidth; velX *= -1; 
-  }
+  const safeDistance = 150; 
+  if(distan
