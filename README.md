@@ -4,4 +4,5 @@ This repository contains a special Valentineâ€™s webpage for Simran Thobhani ðŸ’
 
 Open `index.html` or view live on GitHub Pages:
 
-https://abarai12345.github.io/valentines-/
+https://abarai12345.github.io/Simran/
+
