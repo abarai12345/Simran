@@ -45,7 +45,7 @@
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease;
   }
 
   #yes {
@@ -58,7 +58,7 @@
   #no {
     background: #6c757d;
     color: white;
-    right: 20%;
+    left: 60%;
     bottom: 20px;
   }
 
@@ -96,57 +96,98 @@
 <audio id="music" src="https://www.bensound.com/bensound-music/bensound-love.mp3"></audio>
 
 <script>
-  const noBtn = document.getElementById("no");
-  const yesBtn = document.getElementById("yes");
-  const music = document.getElementById("music");
+const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+const music = document.getElementById("music");
 
-  let yesScale = 1.1;
+let yesScale = 1.1;
 
-  // NO button runs away
-  function moveNo() {
-    const x = Math.random() * (window.innerWidth - 120);
-    const y = Math.random() * (window.innerHeight - 120);
+// NO button position and velocity
+let noX = window.innerWidth * 0.6;
+let noY = window.innerHeight * 0.5;
+let velX = 0;
+let velY = 0;
 
-    noBtn.style.left = x + "px";
-    noBtn.style.top = y + "px";
+function moveNo(mouseX, mouseY) {
+  const btnCenterX = noX + noBtn.offsetWidth / 2;
+  const btnCenterY = noY + noBtn.offsetHeight / 2;
 
-    yesScale += 0.15;
-    yesBtn.style.transform = `scale(${yesScale})`;
+  const dx = btnCenterX - mouseX;
+  const dy = btnCenterY - mouseY;
+  const distance = Math.sqrt(dx*dx + dy*dy);
+
+  // Speed increases the closer the mouse is
+  const maxSpeed = 25; // maximum speed
+  const minSpeed = 5;  // minimum speed
+  const speed = Math.min(maxSpeed, Math.max(minSpeed, 200 / distance));
+
+  // Calculate velocity direction
+  const angle = Math.atan2(dy, dx);
+  velX = Math.cos(angle) * speed;
+  velY = Math.sin(angle) * speed;
+
+  // Update position
+  noX += velX;
+  noY += velY;
+
+  // Bounce off edges
+  if(noX < 0) { noX = 0; velX *= -1; }
+  if(noY < 0) { noY = 0; velY *= -1; }
+  if(noX > window.innerWidth - noBtn.offsetWidth) { 
+    noX = window.innerWidth - noBtn.offsetWidth; velX *= -1; 
+  }
+  if(noY > window.innerHeight - noBtn.offsetHeight) { 
+    noY = window.innerHeight - noBtn.offsetHeight; velY *= -1; 
   }
 
-  noBtn.addEventListener("mouseover", moveNo);
-  noBtn.addEventListener("touchstart", moveNo);
+  noBtn.style.left = noX + "px";
+  noBtn.style.top = noY + "px";
 
-  // YES clicked
-  yesBtn.addEventListener("click", () => {
-    music.play();
+  // YES grows slightly whenever NO moves
+  yesScale += 0.01;
+  yesBtn.style.transform = `scale(${yesScale})`;
 
-    document.body.innerHTML = `
-      <div style="color:white; text-align:center; padding:40px; animation: fadeIn 2s;">
-        <h1>YAYYYY 💕🥰</h1>
-        <h2>Simran, you just made me the happiest person ❤️</h2>
-        <p style="font-size:1.3rem; margin-top:30px; line-height:1.6;">
-          I love you ❤️<br><br>
-          From your amazing and one of a kind man,<br>
-          <strong>Aaron x</strong>
-        </p>
-      </div>
-    `;
+  requestAnimationFrame(() => moveNo(mouseX, mouseY));
+}
 
-    setInterval(createHeart, 250);
-  });
-
-  // Floating hearts
-  function createHeart() {
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerHTML = "❤️";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.fontSize = Math.random() * 20 + 15 + "px";
-    document.body.appendChild(heart);
-
-    setTimeout(() => heart.remove(), 6000);
+// Track mouse/touch
+document.addEventListener("mousemove", e => moveNo(e.clientX, e.clientY));
+document.addEventListener("touchmove", e => {
+  if(e.touches.length > 0){
+    moveNo(e.touches[0].clientX, e.touches[0].clientY);
   }
+});
+
+// YES clicked
+yesBtn.addEventListener("click", () => {
+  music.play();
+
+  document.body.innerHTML = `
+    <div style="color:white; text-align:center; padding:40px; animation: fadeIn 2s;">
+      <h1>YAYYYY 💕🥰</h1>
+      <h2>Simran, you just made me the happiest person ❤️</h2>
+      <p style="font-size:1.3rem; margin-top:30px; line-height:1.6;">
+        I love you ❤️<br><br>
+        From your amazing and one of a kind man,<br>
+        <strong>Aaron x</strong>
+      </p>
+    </div>
+  `;
+
+  setInterval(createHeart, 250);
+});
+
+// Floating hearts
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "❤️";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = Math.random() * 20 + 15 + "px";
+  document.body.appendChild(heart);
+
+  setTimeout(() => heart.remove(), 6000);
+}
 </script>
 
 </body>
